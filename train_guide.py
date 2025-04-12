@@ -50,9 +50,15 @@ class RouteFinderGUI:
         # Destination selection
         ttk.Label(self.main_frame, text="Destination:").grid(row=1, column=0, sticky=tk.E)
         self.dest_var = tk.StringVar()
+        destinations = []
+        for k, v in self.graph.items():
+            for destination in v.keys():
+                if destination not in destinations:
+                    destinations.append(destination)
         self.dest_combo = ttk.Combobox(self.main_frame,
                                      textvariable=self.dest_var,
-                                     values=list(sorted(self.graph.keys())))
+                                     #values=list(sorted(self.graph.keys())))
+                                     values=list(sorted(destinations)))
         self.dest_combo.grid(row=1, column=1, sticky=(tk.W, tk.E))
         
         # Find routes button
@@ -136,6 +142,10 @@ class RouteFinderGUI:
             
             next_destinations = graph.get(current, {})
             for next_dest, edge_cost in next_destinations.items():
+                if not next_dest:
+                    if current == destination:
+                        all_routes.append((path, cost))
+                        return
                 if next_dest not in visited:
                     new_path = path + [next_dest]
                     new_cost = int(cost) + int(edge_cost)
